@@ -16,6 +16,8 @@ void loop() {
 
   int sensorValue = analogRead(A0);
   emgReadings[currentIndex] = sensorValue;
+  Serial.print(sensorValue);
+  Serial.print(" ");
 
   // Serial.println(sensorValue);
   // for(int i = 0; i < 10; i++) {
