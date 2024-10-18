@@ -1,0 +1,15 @@
+{
+  "name": "backend-capstone",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "backend-capstone": "file:",
+    "express": "^4.21.1"
+  }
+}
