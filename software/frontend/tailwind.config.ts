@@ -16,8 +16,15 @@ const config: Config = {
         },
         cyan: {
           primary: "#16AAC3"
+        },
+        dark: {
+          "1" : "#191B2A",
+          "2" : "#202656"
         }
       },
+      fontFamily: {
+        rubik: "Rubik"
+      }
     },
   },
   plugins: [],
