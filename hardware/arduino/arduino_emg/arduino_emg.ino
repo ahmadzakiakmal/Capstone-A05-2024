@@ -9,7 +9,7 @@ void setup() {
 }
 
 void loop() {
-  Serial.print(825);  //Tofreezethelowerlimit 
+  Serial.print(800);  //Tofreezethelowerlimit 
   Serial.print(" ");
   Serial.print(840);  //Tofreezetheupperlimit 
   Serial.print(" ");
