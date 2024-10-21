@@ -4,11 +4,13 @@ interface Props {
   children: ReactNode;
   className?: string;
   disabled?: boolean;
+  onClick?: () => void;
 }
 
-export default function Button({ children, className, disabled = false }: Props) {
+export default function Button({ children, className, disabled = false, onClick = () => {} }: Props) {
   return (
     <button
+      onClick={onClick}
       disabled = {disabled}
       className={`px-6 py-[10px] bg-dark-1 hover:bg-dark-2 transition-colors active:bg-black active:shadow-[0_0_2px_rgba(0,0,0,.9)] rounded-[10px] font-semibold disabled:opacity-60 disabled:cursor-not-allowed ${className}`}
     >
