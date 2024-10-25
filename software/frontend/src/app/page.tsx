@@ -132,14 +132,21 @@ function RequestIP({
         <p className="max-w-[400px] text-dark-1 text-center">
           Enter the IP Address of the EMG device shown on its screen.
         </p>
-        <input
-          type="text"
-          className="bg-[#d4e4de] px-2 !outline-none !text-black w-full text-center py-[10px] text-[24px] font-medium"
-          value={ipAddress}
-          onChange={(e) => setIpAddress(e.target.value)}
-        />
+        <form className="flex flex-col justify-center items-center gap-[10px]">
+          <input
+            type="text"
+            className="bg-[#d4e4de] px-2 !outline-none !text-black w-full text-center py-[10px] text-[24px] font-medium rounded-[10px]"
+            value={ipAddress}
+            onChange={(e) => setIpAddress(e.target.value)}
+          />
+          <Button
+            type="submit"
+            onClick={onButtonClick}
+          >
+            Continue
+          </Button>
+        </form>
       </div>
-      <Button onClick={onButtonClick}>Continue</Button>
     </>
   );
 }
@@ -233,9 +240,9 @@ function IdentityForm({
               onChange={(e) => setPatientData({ name: patientData.name, age: Number(e.target.value) })}
             />
           </label>
+          <Button type="submit" className="text-white" onClick={onButtonClick}>Go To Dashboard</Button>
         </form>
       </div>
-      <Button onClick={onButtonClick}>Go To Dashboard</Button>
     </>
   );
 }
