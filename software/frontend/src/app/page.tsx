@@ -9,12 +9,22 @@ import Connected from "@/../public/Success.png";
 
 import Button from "@/components/Button";
 import { Dispatch, SetStateAction, useState } from "react";
+import { useRouter } from "next/navigation";
+
+type Patient = {
+  name: string;
+  age: number;
+};
 
 export default function Home() {
+  const router = useRouter();
+
   const [step, setStep] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [ipAddress, setIpAddress] = useState<string>("");
+
+  const [patientData, setPatientData] = useState<Patient>({ name: "", age: 0 });
 
   return (
     <main className="bg-gradient-to-tr from-cyan-primary to-green-primary min-h-screen flex flex-col justify-center items-center">
@@ -26,9 +36,9 @@ export default function Home() {
             }}
           />
         )}
-        {step === 1 && <Step1 onButtonClick={() => setStep((prev) => prev + 1)} />}
+        {step === 1 && <ConnectWifi onButtonClick={() => setStep((prev) => prev + 1)} />}
         {step === 2 && (
-          <Step2
+          <RequestIP
             ipAddress={ipAddress}
             setIpAddress={setIpAddress}
             onButtonClick={() => {
@@ -44,20 +54,27 @@ export default function Home() {
             }}
           />
         )}
-        {step > 2 && isLoading && <Loading />}
-        {step > 3 && errorMessage === "" && (
+        {step === 3 && isLoading && <Loading />}
+        {step === 4 && errorMessage === "" && (
           <Success
             onButtonClick={() => {
               setStep((prev) => prev + 1);
             }}
           />
         )}
-        {step > 3 && errorMessage !== "" && (
+        {step === 4 && errorMessage !== "" && (
           <Fail
             onButtonClick={() => {
               setStep(0);
               setErrorMessage("");
             }}
+          />
+        )}
+        {step === 5 && (
+          <IdentityForm
+            onButtonClick={() => router.push("/dashboard")}
+            patientData={patientData}
+            setPatientData={setPatientData}
           />
         )}
       </div>
@@ -77,7 +94,7 @@ function Landing({ onButtonClick }: { onButtonClick: () => void }) {
   );
 }
 
-function Step1({ onButtonClick }: { onButtonClick: () => void }) {
+function ConnectWifi({ onButtonClick }: { onButtonClick: () => void }) {
   return (
     <>
       <Image
@@ -95,7 +112,7 @@ function Step1({ onButtonClick }: { onButtonClick: () => void }) {
   );
 }
 
-function Step2({
+function RequestIP({
   onButtonClick,
   ipAddress,
   setIpAddress,
@@ -175,6 +192,50 @@ function Fail({ onButtonClick }: { onButtonClick: () => void }) {
         </p>
       </div>
       <Button onClick={onButtonClick}>Try Again</Button>
+    </>
+  );
+}
+
+function IdentityForm({
+  onButtonClick,
+  patientData,
+  setPatientData,
+}: {
+  onButtonClick: () => void;
+  patientData: Patient;
+  setPatientData: Dispatch<SetStateAction<Patient>>;
+}) {
+  return (
+    <>
+      <Image
+        src={Connected}
+        alt="Connect Your Device"
+      />
+      <div className="flex flex-col gap-[10px]">
+        <h1 className="text-[24px] text-dark-1 font-semibold text-center">Enter Identity</h1>
+        <p className="max-w-[400px] text-dark-1 text-center">Fill out the following identity form.</p>
+        <form className="text-black flex flex-col gap-[15px]">
+          <label>
+            Name
+            <input
+              type="text"
+              className="bg-[#d4e4de] !outline-none !text-black w-full px-[15px] py-[12px] text-[20px] font-medium rounded-[10px]"
+              value={patientData.name}
+              onChange={(e) => setPatientData({ name: e.target.value, age: patientData.age })}
+            />
+          </label>
+          <label>
+            Age
+            <input
+              type="number"
+              className="bg-[#d4e4de] !outline-none !text-black w-full px-[15px] py-[12px] text-[20px] font-medium rounded-[10px]"
+              value={patientData.age}
+              onChange={(e) => setPatientData({ name: patientData.name, age: Number(e.target.value) })}
+            />
+          </label>
+        </form>
+      </div>
+      <Button onClick={onButtonClick}>Go To Dashboard</Button>
     </>
   );
 }
