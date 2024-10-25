@@ -8,7 +8,7 @@ import SearchingDevice from "@/../public/SearchingDevice.png";
 import Connected from "@/../public/Success.png";
 
 import Button from "@/components/Button";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, FormEvent, SetStateAction, useState } from "react";
 import { useRouter } from "next/navigation";
 
 type Patient = {
@@ -28,7 +28,7 @@ export default function Home() {
 
   return (
     <main className="bg-gradient-to-tr from-cyan-primary to-green-primary min-h-screen flex flex-col justify-center items-center">
-      <div className="bg-white/90 rounded-[10px] py-10 flex flex-col justify-center items-center gap-5 min-w-[500px]">
+      <div className="bg-white/90 rounded-[10px] py-10 flex flex-col justify-center items-center gap-5 min-w-[500px] shadow-[0_4px_4px_rgba(0,0,0,.25)]">
         {step === 0 && (
           <Landing
             onButtonClick={() => {
@@ -41,7 +41,8 @@ export default function Home() {
           <RequestIP
             ipAddress={ipAddress}
             setIpAddress={setIpAddress}
-            onButtonClick={() => {
+            onSubmit={(e) => {
+              e.preventDefault();
               setIsLoading(true);
               setStep((prev) => prev + 1);
               setTimeout(() => {
@@ -72,7 +73,10 @@ export default function Home() {
         )}
         {step === 5 && (
           <IdentityForm
-            onButtonClick={() => router.push("/dashboard")}
+            onSubmit={(e) => {
+              e.preventDefault();
+              router.push("/dashboard");
+            }}
             patientData={patientData}
             setPatientData={setPatientData}
           />
@@ -89,7 +93,12 @@ function Landing({ onButtonClick }: { onButtonClick: () => void }) {
         src={Logo}
         alt="Logo"
       />
-      <Button onClick={onButtonClick}>Start</Button>
+      <Button
+        type="submit"
+        onClick={onButtonClick}
+      >
+        Start
+      </Button>
     </>
   );
 }
@@ -113,11 +122,11 @@ function ConnectWifi({ onButtonClick }: { onButtonClick: () => void }) {
 }
 
 function RequestIP({
-  onButtonClick,
+  onSubmit,
   ipAddress,
   setIpAddress,
 }: {
-  onButtonClick: () => void;
+  onSubmit: (e: FormEvent) => void;
   ipAddress: string;
   setIpAddress: Dispatch<SetStateAction<string>>;
 }) {
@@ -132,19 +141,17 @@ function RequestIP({
         <p className="max-w-[400px] text-dark-1 text-center">
           Enter the IP Address of the EMG device shown on its screen.
         </p>
-        <form className="flex flex-col justify-center items-center gap-[10px]">
+        <form
+          className="flex flex-col justify-center items-center gap-[10px]"
+          onSubmit={onSubmit}
+        >
           <input
             type="text"
             className="bg-[#d4e4de] px-2 !outline-none !text-black w-full text-center py-[10px] text-[24px] font-medium rounded-[10px]"
             value={ipAddress}
             onChange={(e) => setIpAddress(e.target.value)}
           />
-          <Button
-            type="submit"
-            onClick={onButtonClick}
-          >
-            Continue
-          </Button>
+          <Button type="submit">Continue</Button>
         </form>
       </div>
     </>
@@ -204,11 +211,11 @@ function Fail({ onButtonClick }: { onButtonClick: () => void }) {
 }
 
 function IdentityForm({
-  onButtonClick,
+  onSubmit,
   patientData,
   setPatientData,
 }: {
-  onButtonClick: () => void;
+  onSubmit: (e: FormEvent) => void;
   patientData: Patient;
   setPatientData: Dispatch<SetStateAction<Patient>>;
 }) {
@@ -221,7 +228,10 @@ function IdentityForm({
       <div className="flex flex-col gap-[10px]">
         <h1 className="text-[24px] text-dark-1 font-semibold text-center">Enter Identity</h1>
         <p className="max-w-[400px] text-dark-1 text-center">Fill out the following identity form.</p>
-        <form className="text-black flex flex-col gap-[15px]">
+        <form
+          className="text-black flex flex-col gap-[15px]"
+          onSubmit={onSubmit}
+        >
           <label>
             Name
             <input
@@ -240,7 +250,12 @@ function IdentityForm({
               onChange={(e) => setPatientData({ name: patientData.name, age: Number(e.target.value) })}
             />
           </label>
-          <Button type="submit" className="text-white" onClick={onButtonClick}>Go To Dashboard</Button>
+          <Button
+            type="submit"
+            className="text-white"
+          >
+            Go To Dashboard
+          </Button>
         </form>
       </div>
     </>
