@@ -1,4 +1,5 @@
 "use client";
+import Card from "@/components/Card";
 import Navbar from "@/components/Navbar";
 import { useEffect, useState } from "react";
 
@@ -51,24 +52,26 @@ export default function Dashboard() {
   return (
     <main className="bg-[#F3F4F6] min-h-screen">
       <Navbar />
-      <div className="text-black font-mono">
-        <p>
-          {realtimeData.map((d) => {
-            return (
-              <>
-                <span>{d.value.toFixed(2)},</span>
-              </>
-            );
-          })}
-        </p>
+      <div className="text-black font-mono p-10 flex flex-col gap-5">
+        <Card>
+          <p>
+            {realtimeData.map((d) => {
+              return (
+                <>
+                  <span>{d.value.toFixed(2)}, </span>
+                </>
+              );
+            })}
+          </p>
+        </Card>
 
-        <p>
-          {averageAmplitude}
-        </p>
+        <Card>
+          <p>{averageAmplitude}</p>
+        </Card>
 
-        <p>
-          {peakAmplitude}
-        </p>
+        <Card>
+          <p>{peakAmplitude}</p>
+        </Card>
       </div>
     </main>
   );
