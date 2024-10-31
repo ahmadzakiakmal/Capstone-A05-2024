@@ -2,6 +2,7 @@
 import Card from "@/components/Card";
 import Navbar from "@/components/Navbar";
 import { useEffect, useState } from "react";
+import { CartesianGrid, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
 type DataPoint = {
   time: string;
@@ -52,26 +53,54 @@ export default function Dashboard() {
   return (
     <main className="bg-[#F3F4F6] min-h-screen">
       <Navbar />
-      <div className="text-black font-mono p-10 flex flex-col gap-5">
-        <Card>
-          <p>
-            {realtimeData.map((d) => {
-              return (
-                <>
-                  <span>{d.value.toFixed(2)}, </span>
-                </>
-              );
-            })}
-          </p>
-        </Card>
+      <div className="text-black p-10 flex flex-col gap-5">
+        <div className="flex gap-5">
+          <Card className="w-full">
+            <h1 className="text-[25px] font-medium mb-5">Real-time EMG Signal</h1>
+            <ResponsiveContainer
+              width="100%"
+              height={200}
+            >
+              <LineChart data={realtimeData}>
+                <CartesianGrid />
+                <XAxis dataKey="time" />
+                <YAxis />
+                <Line dataKey="value" stroke="#16AAC3" />
+              </LineChart>
+            </ResponsiveContainer>
+          </Card>
 
-        <Card>
-          <p>{averageAmplitude}</p>
-        </Card>
+          <Card className="w-full">
+            <h1 className="text-[25px] font-medium mb-5">Historical Trend</h1>
+            <ResponsiveContainer
+              width="100%"
+              height={200}
+            >
+              <LineChart data={historicalData}>
+                <CartesianGrid />
+                <XAxis dataKey="time" />
+                <YAxis />
+                <Line dataKey="value" stroke="#16AAC3" />
+              </LineChart>
+            </ResponsiveContainer>
+          </Card>
+        </div>
 
-        <Card>
-          <p>{peakAmplitude}</p>
-        </Card>
+        <div className="flex gap-5">
+          <Card className="w-full">
+            <h1 className="text-[25px] font-medium mb-5">Average Amplitude</h1>
+            <p className="text-4xl font-bold">{averageAmplitude.toFixed(2)}</p>
+          </Card>
+
+          <Card className="w-full">
+            <h1 className="text-[25px] font-medium mb-5">Peak Amplitude</h1>
+            <p className="text-4xl font-bold">{peakAmplitude.toFixed(2)}</p>
+          </Card>
+          <Card className="w-full">
+            <h1 className="text-[25px] font-medium mb-5">Root Mean Squared (RMS)</h1>
+            <p className="text-4xl font-bold">{peakAmplitude.toFixed(2)}</p>
+          </Card>
+        </div>
       </div>
     </main>
   );
