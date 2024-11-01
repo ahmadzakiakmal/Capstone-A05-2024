@@ -9,9 +9,13 @@ void setup() {
 }
 
 void loop() {
-  Serial.print(800);  //Tofreezethelowerlimit 
+  int lowerbit = 800 % 256;
+  int upperbit = (800 >> 8) % 256;
+  Serial.print(lowerbit);  //Tofreezethelowerlimit 
   Serial.print(" ");
-  Serial.print(840);  //Tofreezetheupperlimit 
+  Serial.print(upperbit);  //Tofreezethelowerlimit 
+  Serial.print(" ");
+  Serial.print("840");  //Tofreezetheupperlimit 
   Serial.print(" ");
 
   int sensorValue = analogRead(A0);
