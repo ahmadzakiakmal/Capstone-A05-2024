@@ -15,5 +15,9 @@
     "mqtt": "^5.10.1",
     "myosense-backend-express": "file:",
     "nodemon": "^3.1.7"
+  },
+  "devDependencies": {
+    "eslint": "^9.14.0",
+    "globals": "^15.11.0"
   }
 }

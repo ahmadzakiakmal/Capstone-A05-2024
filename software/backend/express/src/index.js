@@ -1,12 +1,12 @@
-const express = require("express")
-const app = express()
-const port = 5000
-const mqtt = require("mqtt")
-const dotenv = require("dotenv")
+const express = require("express");
+const app = express();
+const port = 5000;
+const mqtt = require("mqtt");
+const dotenv = require("dotenv");
 
 dotenv.config({ debug: true, path: "./src/config/.env" });
 
-const requiredEnvVars = ['MQTT_BROKER_ADDRESS', 'MQTT_USERNAME', 'MQTT_PASSWORD'];
+const requiredEnvVars = ["MQTT_BROKER_ADDRESS", "MQTT_USERNAME", "MQTT_PASSWORD"];
 
 requiredEnvVars.forEach((varName) => {
   if (!process.env[varName]) {
@@ -22,28 +22,29 @@ const mqttClient = mqtt.connect(process.env.MQTT_BROKER_ADDRESS, {
 
 mqttClient.on("connect", () => {
   console.log("Connected to broker");
-  mqttClient.subscribe('esp32/data', (err) => {
+  const topic = "esp32/data";
+  mqttClient.subscribe(topic, (err) => {
     if (err) {
-      console.error('Subscription error:', err);
+      console.error("Subscription error:", err);
     } else {
-      console.log('Subscribed to topic: esp32/data');
+      console.log("Subscribed to topic: " + topic);
     }
   });
-})
+});
 
-mqttClient.on('error', (err) => {
-  console.error('Connection error: ', err);
+mqttClient.on("error", (err) => {
+  console.error("Connection error: ", err);
   mqttClient.end();
 });
 
 mqttClient.on("message", (topic, message) => {
   console.log(topic, "→", message.toString());
-})
+});
 
-app.get('/', (req, res) => {
-  res.sendFile("views/index.html", { root: __dirname })
-})
+app.get("/", (req, res) => {
+  res.sendFile("views/index.html", { root: __dirname });
+});
 
 app.listen(port, () => {
-  console.log(`MyoSense server running on port ${port}`)
-})
+  console.log(`MyoSense server running on port ${port}`);
+});
