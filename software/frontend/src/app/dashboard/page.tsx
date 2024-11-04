@@ -1,6 +1,7 @@
 "use client";
 import Card from "@/components/Card";
 import Navbar from "@/components/Navbar";
+import mqtt from "mqtt";
 import { useEffect, useState } from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
@@ -15,39 +16,46 @@ export default function Dashboard() {
   const [averageAmplitude, setAverageAmplitude] = useState(0);
   const [peakAmplitude, setPeakAmplitude] = useState(0);
 
-  const getEMGData = () => {
-    return Math.sin(Date.now() / 1000) * Math.random() * 50 + 50;
-  };
-
   useEffect(() => {
-    const interval = setInterval(() => {
-      const newDataPoint = { time: new Date().toLocaleTimeString(), value: getEMGData() };
+    const client = mqtt.connect("ws://192.168.137.1:8083/mqtt", {
+      username: "myosense-frontend",
+      password: "myosensefrontend"
+    });
+    console.log(client.connected);
 
-      setRealtimeData((prevData: DataPoint[]) => {
-        const newData = [...prevData, newDataPoint];
-        // console.log(newDataPoint);
-        if (newData.length > 50) newData.shift();
-        return newData;
-      });
+    client.on("connect", () => {
+      console.log("connected to broker via ws");
+      client.subscribe("esp32/data", (err) => {
+        if(err) {
+          return console.log("Error :", err)
+        }
+        console.log("Subscribed to esp32/data");
+      })
+    })
 
+    client.on("message", (topic, message) => {
+      // console.log(topic, "→", message.toString())
+      const newDataPoint = {
+        time: new Date().getMilliseconds().toString(),
+        value: Number((message).toString())
+      }
       setHistoricalData((prevData: DataPoint[]) => {
         const newData: DataPoint[] = [...prevData, newDataPoint];
-        // console.log(newDataPoint);
         if (newData.length > 1000) newData.shift();
         return newData;
       });
-
-      setAverageAmplitude((prevAvg) => {
-        // console.log((prevAvg + newDataPoint.value) / 2);
-        return (prevAvg + newDataPoint.value) / 2;
+      setRealtimeData((prevData: DataPoint[]) => {
+        const newData: DataPoint[] = [...prevData, newDataPoint];
+        if (newData.length > 50) newData.shift();
+        return newData;
       });
       setPeakAmplitude((prevPeak) => {
-        // console.log(Math.max(prevPeak, newDataPoint.value));
         return Math.max(prevPeak, newDataPoint.value);
       });
-    }, 100);
-
-    return () => clearInterval(interval);
+      setAverageAmplitude((prevAvg) => {
+        return (prevAvg + newDataPoint.value) / 2;
+      });
+    })
   }, []);
 
   return (
