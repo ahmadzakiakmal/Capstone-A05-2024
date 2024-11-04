@@ -12,7 +12,7 @@
 #include <TFT_eSPI.h>
 #include <image.h>
 
-#define EMG_PIN 2
+#define EMG_PIN 33
 #define SCREEN_WIDTH 240
 #define SCREEN_HEIGHT 320
 #define DRAW_BUF_SIZE (SCREEN_WIDTH * SCREEN_HEIGHT / 10 * (LV_COLOR_DEPTH / 8))
@@ -69,7 +69,8 @@ void loop() {
   int sensorValue = readEMG();
   // Serial.println(sensorValue);
   String sensorValueStr = String(sensorValue);
-  client.publish("esp32/myo-sense/emg", (const uint8_t*)sensorValueStr.c_str(), sensorValueStr.length());
+  client.publish("esp32/data", (const uint8_t*)sensorValueStr.c_str(), sensorValueStr.length());
+  delay(1);
 }
 
 int readEMG() {
@@ -91,10 +92,8 @@ void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.connect("ESP8266Client")) {
+    if (client.connect("myosense-esp32")) {
       Serial.println("connected");
-      // Subscribe
-      client.subscribe("esp32/output");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
