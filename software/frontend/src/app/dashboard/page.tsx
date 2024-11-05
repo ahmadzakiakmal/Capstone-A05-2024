@@ -1,6 +1,7 @@
 "use client";
 import Card from "@/components/Card";
 import Navbar from "@/components/Navbar";
+import PopUp from "@/components/PopUp";
 import mqtt from "mqtt";
 import { useEffect, useState } from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
@@ -16,6 +17,7 @@ export default function Dashboard() {
   const [averageAmplitude, setAverageAmplitude] = useState<number>(0);
   const [peakAmplitude, setPeakAmplitude] = useState<number>(0);
   const [rms, setRms] = useState<number>(0);
+  const [showPopUp, setShowPopUp] = useState<boolean>(true);
 
   useEffect(() => {
     const client = mqtt.connect("ws://192.168.137.1:8083/mqtt", {
@@ -50,7 +52,7 @@ export default function Dashboard() {
         if (newData.length > 20) newData.shift();
 
         const sumSquared: number = newData.slice(-4).reduce((acc, data) => {
-          return acc + data.value ** 2
+          return acc + data.value ** 2;
         }, 0);
         setRms(sumSquared / (newData.length > 4 ? 4 : newData.length));
 
@@ -70,6 +72,19 @@ export default function Dashboard() {
   return (
     <main className="bg-[#F3F4F6] min-h-screen">
       <Navbar />
+      <PopUp
+        show={showPopUp}
+        onConfirm={() => setShowPopUp(false)}
+      >
+        <div className="text-[18px] max-w-[500px]">
+          <h1 className="text-[24px] font-semibold text-center mb-6">Phase 1</h1>
+          <p className="text-center">
+            <strong>Connect the EMG sensor&apos;s electrodes and attach them to the muscle</strong>.
+            <br/>
+            Once done, click Start
+          </p>
+        </div>
+      </PopUp>
       <div className="text-black p-10 flex flex-col gap-5">
         <div className="flex gap-5">
           <Card className="w-full">
