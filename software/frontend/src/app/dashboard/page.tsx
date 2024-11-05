@@ -13,49 +13,58 @@ type DataPoint = {
 export default function Dashboard() {
   const [realtimeData, setRealtimeData] = useState<DataPoint[]>([]);
   const [historicalData, setHistoricalData] = useState<DataPoint[]>([]);
-  const [averageAmplitude, setAverageAmplitude] = useState(0);
-  const [peakAmplitude, setPeakAmplitude] = useState(0);
+  const [averageAmplitude, setAverageAmplitude] = useState<number>(0);
+  const [peakAmplitude, setPeakAmplitude] = useState<number>(0);
+  const [rms, setRms] = useState<number>(0);
 
   useEffect(() => {
     const client = mqtt.connect("ws://192.168.137.1:8083/mqtt", {
       username: "myosense-frontend",
-      password: "myosensefrontend"
+      password: "myosensefrontend",
     });
     console.log(client.connected);
 
     client.on("connect", () => {
       console.log("connected to broker via ws");
       client.subscribe("esp32/data", (err) => {
-        if(err) {
-          return console.log("Error :", err)
+        if (err) {
+          return console.log("Error :", err);
         }
         console.log("Subscribed to esp32/data");
-      })
-    })
+      });
+    });
 
     client.on("message", (topic, message) => {
-      // console.log(topic, "→", message.toString())
       const newDataPoint = {
         time: new Date().getMilliseconds().toString(),
-        value: Number((message).toString())
-      }
+        value: Number(message.toString()),
+      };
       setHistoricalData((prevData: DataPoint[]) => {
         const newData: DataPoint[] = [...prevData, newDataPoint];
-        if (newData.length > 1000) newData.shift();
+        if (newData.length > 500) newData.shift();
         return newData;
       });
+
       setRealtimeData((prevData: DataPoint[]) => {
         const newData: DataPoint[] = [...prevData, newDataPoint];
-        if (newData.length > 50) newData.shift();
+        if (newData.length > 20) newData.shift();
+
+        const sumSquared: number = newData.slice(-4).reduce((acc, data) => {
+          return acc + data.value ** 2
+        }, 0);
+        setRms(sumSquared / (newData.length > 4 ? 4 : newData.length));
+
         return newData;
       });
+
       setPeakAmplitude((prevPeak) => {
         return Math.max(prevPeak, newDataPoint.value);
       });
+
       setAverageAmplitude((prevAvg) => {
         return (prevAvg + newDataPoint.value) / 2;
       });
-    })
+    });
   }, []);
 
   return (
@@ -73,7 +82,10 @@ export default function Dashboard() {
                 <CartesianGrid />
                 <XAxis dataKey="time" />
                 <YAxis />
-                <Line dataKey="value" stroke="#16AAC3" />
+                <Line
+                  dataKey="value"
+                  stroke="#16AAC3"
+                />
               </LineChart>
             </ResponsiveContainer>
           </Card>
@@ -88,7 +100,10 @@ export default function Dashboard() {
                 <CartesianGrid />
                 <XAxis dataKey="time" />
                 <YAxis />
-                <Line dataKey="value" stroke="#16AAC3" />
+                <Line
+                  dataKey="value"
+                  stroke="#16AAC3"
+                />
               </LineChart>
             </ResponsiveContainer>
           </Card>
@@ -106,7 +121,7 @@ export default function Dashboard() {
           </Card>
           <Card className="w-full">
             <h1 className="text-[25px] font-medium mb-5">Root Mean Squared (RMS)</h1>
-            <p className="text-4xl font-bold">{peakAmplitude.toFixed(2)}</p>
+            <p className="text-4xl font-bold">{rms.toFixed(2)}</p>
           </Card>
         </div>
       </div>
