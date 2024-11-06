@@ -17,6 +17,7 @@ export default function Dashboard() {
   const [averageAmplitude, setAverageAmplitude] = useState<number>(0);
   const [peakAmplitude, setPeakAmplitude] = useState<number>(0);
   const [rms, setRms] = useState<number>(0);
+  const [maxRms, setMaxRms] = useState<number>(0);
   const [showPopUp, setShowPopUp] = useState<boolean>(true);
 
   useEffect(() => {
@@ -43,28 +44,31 @@ export default function Dashboard() {
       };
       setHistoricalData((prevData: DataPoint[]) => {
         const newData: DataPoint[] = [...prevData, newDataPoint];
-        if (newData.length > 500) newData.shift();
+        if (newData.length > 400) newData.shift();
         return newData;
       });
 
       setRealtimeData((prevData: DataPoint[]) => {
         const newData: DataPoint[] = [...prevData, newDataPoint];
-        if (newData.length > 20) newData.shift();
+        if (newData.length > 100) newData.shift();
 
-        const sumSquared: number = newData.slice(-4).reduce((acc, data) => {
-          return acc + data.value ** 2;
+        const sumSquared: number = newData.reduce((acc, data) => {
+          return acc + (data.value * 3.3 / 4095) ** 2;
         }, 0);
-        setRms(sumSquared / (newData.length > 4 ? 4 : newData.length));
+        setRms(Number(sumSquared.toFixed(2)) / (newData.length > 100 ? 100 : newData.length));
+        setMaxRms((prev) => {
+          return Math.max(prev, sumSquared / (newData.length > 100 ? 100 : newData.length));
+        });
 
         return newData;
       });
 
-      setPeakAmplitude((prevPeak) => {
-        return Math.max(prevPeak, newDataPoint.value);
+      setPeakAmplitude((prev) => {
+        return Math.max(prev, newDataPoint.value * 3.3 / 4095);
       });
 
       setAverageAmplitude((prevAvg) => {
-        return (prevAvg + newDataPoint.value) / 2;
+        return (prevAvg + newDataPoint.value * 3.3 / 4095) / 2;
       });
     });
   }, []);
@@ -80,7 +84,7 @@ export default function Dashboard() {
           <h1 className="text-[24px] font-semibold text-center mb-6">Phase 1</h1>
           <p className="text-center">
             <strong>Connect the EMG sensor&apos;s electrodes and attach them to the muscle</strong>.
-            <br/>
+            <br />
             Once done, click Start
           </p>
         </div>
@@ -138,6 +142,22 @@ export default function Dashboard() {
             <h1 className="text-[25px] font-medium mb-5">Root Mean Squared (RMS)</h1>
             <p className="text-4xl font-bold">{rms.toFixed(2)}</p>
           </Card>
+        </div>
+
+        <div className="flex gap-5">
+          <Card className="w-full">
+            <h1 className="text-[25px] font-medium mb-5">Max RMS</h1>
+            <p className="text-4xl font-bold">{maxRms.toFixed(2)}</p>
+          </Card>
+          {/* 
+          <Card className="w-full">
+            <h1 className="text-[25px] font-medium mb-5">Peak Amplitude</h1>
+            <p className="text-4xl font-bold">{peakAmplitude.toFixed(2)}</p>
+          </Card>
+          <Card className="w-full">
+            <h1 className="text-[25px] font-medium mb-5">Root Mean Squared (RMS)</h1>
+            <p className="text-4xl font-bold">{rms.toFixed(2)}</p>
+          </Card> */}
         </div>
       </div>
     </main>
