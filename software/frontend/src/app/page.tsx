@@ -92,6 +92,7 @@ function Landing({ onButtonClick }: { onButtonClick: () => void }) {
       <Image
         src={Logo}
         alt="Logo"
+        priority
       />
       <Button
         type="submit"
@@ -107,6 +108,7 @@ function ConnectWifi({ onButtonClick }: { onButtonClick: () => void }) {
   return (
     <>
       <Image
+        priority
         src={ConnectYourDevice}
         alt="Connect Your Device"
       />
