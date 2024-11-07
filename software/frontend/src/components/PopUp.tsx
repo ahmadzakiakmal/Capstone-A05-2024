@@ -22,7 +22,7 @@ export default function PopUp({
   if (show)
     return (
       <div className="w-screen h-screen fixed top-0 left-0 bg-dark-1/80 z-[10] flex flex-col justify-center items-center text-dark-1">
-        <Card>
+        <Card className="min-w-[500px]">
           {children}
           <div className="flex justify-center gap-5 text-white mt-6">
             {onConfirm && <Button onClick={() => onConfirm()}>{confirmText}</Button>}
