@@ -11,11 +11,6 @@ import Button from "@/components/Button";
 import { Dispatch, FormEvent, SetStateAction, useState } from "react";
 import { useRouter } from "next/navigation";
 
-type Patient = {
-  name: string;
-  age: number;
-};
-
 export default function Home() {
   const router = useRouter();
 
@@ -24,15 +19,13 @@ export default function Home() {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [ipAddress, setIpAddress] = useState<string>("");
 
-  const [patientData, setPatientData] = useState<Patient>({ name: "", age: 0 });
-
   return (
     <main className="bg-gradient-to-tr from-cyan-primary to-green-primary min-h-screen flex flex-col justify-center items-center">
       <div className="bg-white/90 rounded-[10px] py-10 flex flex-col justify-center items-center gap-5 min-w-[500px] shadow-[0_4px_4px_rgba(0,0,0,.25)]">
         {step === 0 && (
           <Landing
             onButtonClick={() => {
-              setStep((prev) => prev + 1);
+              router.push("/dashboard");
             }}
           />
         )}
@@ -69,16 +62,6 @@ export default function Home() {
               setStep(0);
               setErrorMessage("");
             }}
-          />
-        )}
-        {step === 5 && (
-          <IdentityForm
-            onSubmit={(e) => {
-              e.preventDefault();
-              router.push("/dashboard");
-            }}
-            patientData={patientData}
-            setPatientData={setPatientData}
           />
         )}
       </div>
@@ -212,55 +195,4 @@ function Fail({ onButtonClick }: { onButtonClick: () => void }) {
   );
 }
 
-function IdentityForm({
-  onSubmit,
-  patientData,
-  setPatientData,
-}: {
-  onSubmit: (e: FormEvent) => void;
-  patientData: Patient;
-  setPatientData: Dispatch<SetStateAction<Patient>>;
-}) {
-  return (
-    <>
-      <Image
-        src={Connected}
-        alt="Connect Your Device"
-      />
-      <div className="flex flex-col gap-[10px]">
-        <h1 className="text-[24px] text-dark-1 font-semibold text-center">Enter Identity</h1>
-        <p className="max-w-[400px] text-dark-1 text-center">Fill out the following identity form.</p>
-        <form
-          className="text-black flex flex-col gap-[15px]"
-          onSubmit={onSubmit}
-        >
-          <label>
-            Name
-            <input
-              type="text"
-              className="bg-[#d4e4de] !outline-none !text-black w-full px-[15px] py-[12px] text-[20px] font-medium rounded-[10px]"
-              value={patientData.name}
-              onChange={(e) => setPatientData({ name: e.target.value, age: patientData.age })}
-            />
-          </label>
-          <label>
-            Age
-            <input
-              type="number"
-              className="bg-[#d4e4de] !outline-none !text-black w-full px-[15px] py-[12px] text-[20px] font-medium rounded-[10px]"
-              value={patientData.age}
-              onChange={(e) => setPatientData({ name: patientData.name, age: Number(e.target.value) })}
-            />
-          </label>
-          <Button
-            type="submit"
-            className="text-white"
-          >
-            Go To Dashboard
-          </Button>
-        </form>
-      </div>
-    </>
-  );
-}
 
