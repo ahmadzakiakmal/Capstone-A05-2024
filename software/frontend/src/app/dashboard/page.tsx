@@ -51,7 +51,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     setTimeout(() => {}, 10);
-    const client = mqtt.connect("ws://192.168.137.1:8083/mqtt");
+    const client = mqtt.connect("ws://localhost:8083/mqtt");
     client.on("connect", () => console.log("connected to broker"));
 
     client.on("message", (_, message) => {
@@ -123,6 +123,7 @@ export default function Dashboard() {
                 .then((res) => {
                   console.log(res.data.message);
                   alert("Data berhasil disimpan dengan id " + res.data.id);
+                  setShowPopUp(false);
                 })
                 .catch((err) => {
                   console.log(err.response.data.message);
