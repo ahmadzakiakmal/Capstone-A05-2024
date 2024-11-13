@@ -4,35 +4,46 @@ import Card from "@/components/Card";
 import Navbar from "@/components/Navbar";
 import PopUp from "@/components/PopUp";
 import mqtt, { MqttClient } from "mqtt";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
 import PlayIcon from "@/../public/PlayIcon.png";
 import PauseIcon from "@/../public/PauseIcon.png";
 import Image from "next/image";
-import IdentityForm from "@/components/IdentityForm";
+import axios from "axios";
 
 type DataPoint = {
   time: string;
   value: number;
 };
 
+// type PatientData = {
+//   name: string;
+//   age: number;
+//   maxRms: number;
+//   maxAmplitude: number;
+//   dateOfExamination: string;
+// };
+
 export default function Dashboard() {
   const [realtimeData, setRealtimeData] = useState<DataPoint[]>([]);
   const [historicalData, setHistoricalData] = useState<DataPoint[]>([]);
-  const [averageAmplitude, setAverageAmplitude] = useState<number>(0);
-  const [peakAmplitude, setPeakAmplitude] = useState<number>(0);
+  const [averageAmplitude, setAverageAmplitude] = useState<number>(2);
+  const [maxAmplitude, setMaxAmplitude] = useState<number>(3);
   const [rms, setRms] = useState<number>(0);
-  const [maxRms, setMaxRms] = useState<number>(0);
+  const [maxRms, setMaxRms] = useState<number>(4);
   const [showPopUp, setShowPopUp] = useState<boolean>(false);
   const [mqttClient, setMqttClient] = useState<MqttClient | null>(null);
   const [isRecording, setIsRecording] = useState<boolean>(false);
+
+  const [patientName, setPatientName] = useState<string>("");
+  const [patientAge, setPatientAge] = useState<number>(0);
 
   const reset = () => {
     setRealtimeData([]);
     setHistoricalData([]);
     setAverageAmplitude(0);
-    setPeakAmplitude(0);
+    setMaxAmplitude(0);
     setRms(0);
     setMaxRms(0);
     setIsRecording(false);
@@ -69,7 +80,7 @@ export default function Dashboard() {
         return newData;
       });
 
-      setPeakAmplitude((prev) => {
+      setMaxAmplitude((prev) => {
         return Math.max(prev, (newDataPoint.value * 3.3) / 4095);
       });
 
@@ -86,9 +97,84 @@ export default function Dashboard() {
       <PopUp
         show={showPopUp}
         confirmText="Save"
-        onConfirm={() => {}}
       >
-        <IdentityForm />
+        <div className="flex flex-col gap-[10px]">
+          <h1 className="text-[24px] text-dark-1 font-semibold text-center">Enter Identity</h1>
+          <p className="max-w-[400px] text-dark-1 text-center">Fill out the following identity form.</p>
+          <form
+            className="text-black flex flex-col gap-[15px]"
+            onSubmit={(e: FormEvent) => {
+              e.preventDefault();
+              if (!patientName) {
+                return alert("Nama wajib diisi");
+              }
+              if (patientAge === 0) {
+                return alert("Umur wajib diisi");
+              }
+              const requestBody = {
+                name: patientName,
+                age: patientAge,
+                maxRms,
+                averageAmplitude,
+                maxAmplitude,
+              };
+              axios
+                .post("http://localhost:5000/patient-data", requestBody)
+                .then((res) => {
+                  console.log(res.data.message);
+                  alert("Data berhasil disimpan dengan id " + res.data.id);
+                })
+                .catch((err) => {
+                  console.log(err.response.data.message);
+                  alert(err.response.data.message);
+                });
+              console.log(requestBody);
+            }}
+          >
+            <label>
+              Name
+              <input
+                type="text"
+                className="bg-[#dedede] !outline-none !text-black w-full px-[15px] py-[12px] text-[20px] font-medium rounded-[10px]"
+                value={patientName}
+                onChange={(e) => setPatientName(e.target.value)}
+              />
+            </label>
+            <label>
+              Age
+              <input
+                type="number"
+                className="bg-[#dedede] !outline-none !text-black w-full px-[15px] py-[12px] text-[20px] font-medium rounded-[10px]"
+                value={patientAge}
+                onChange={(e) => {
+                  setPatientAge(Number(e.target.value));
+                }}
+              />
+            </label>
+            <div className="w-full h-[2px] bg-[#dedede] mt-2" />
+            <div>
+              <h1 className="text-center font-medium mb-1">Recording Results</h1>
+              <div className="flex justify-between gap-5">
+                <span>Max RMS:</span> <span>{maxRms.toFixed(2)} V</span>
+              </div>
+              <div className="flex justify-between gap-5">
+                <span>Max Amplitude:</span> <span>{maxAmplitude.toFixed(2)} V</span>
+              </div>
+              <div className="flex justify-between gap-5">
+                <span>Average Amplitude:</span> <span>{averageAmplitude.toFixed(2)} V</span>
+              </div>
+              <div className="flex justify-between gap-5">
+                <span>Examination Date:</span> <span>{new Date().toLocaleDateString()}</span>
+              </div>
+            </div>
+            <Button
+              type="submit"
+              className="text-white font-medium"
+            >
+              Save Data
+            </Button>
+          </form>
+        </div>
       </PopUp>
       <div className="text-black p-10 flex flex-col gap-5">
         <div className="flex justify-end gap-2">
@@ -127,11 +213,16 @@ export default function Dashboard() {
             )}
             {isRecording ? "End " : "Start "} Recording
           </Button>
-          {
-            isRecording && (
-              <Button className="text-white" onClick={() => {reset()}}>Cancel</Button>
-            )
-          }
+          {isRecording && (
+            <Button
+              className="text-white"
+              onClick={() => {
+                reset();
+              }}
+            >
+              Cancel
+            </Button>
+          )}
         </div>
 
         <div className="flex gap-5">
@@ -180,7 +271,7 @@ export default function Dashboard() {
 
           <Card className="w-full">
             <h1 className="text-[25px] font-medium mb-5">Peak Amplitude</h1>
-            <p className="text-4xl font-bold">{peakAmplitude.toFixed(2)} V</p>
+            <p className="text-4xl font-bold">{maxAmplitude.toFixed(2)} V</p>
           </Card>
         </div>
 

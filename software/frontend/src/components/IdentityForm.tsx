@@ -1,14 +1,3 @@
-import { FormEvent } from "react";
-import Button from "./Button";
-
-type PatientData = {
-  name: string;
-  age: number;
-  maxRms: number;
-  maxAmplitude: number;
-  dateOfExamination: string;
-};
-
 export default function IdentityForm() {
   return (
     <>

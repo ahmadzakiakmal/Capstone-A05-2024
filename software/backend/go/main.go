@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/ahmadzakiakmal/myosense/initializers"
 	"github.com/ahmadzakiakmal/myosense/models"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,6 +14,10 @@ func init() {
 
 func main() {
 	r := gin.Default()
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+
+	r.Use(cors.New(config))
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, map[string]interface{}{
@@ -41,9 +46,17 @@ func main() {
 			})
 			return
 		}
-		initializers.DB.Create(&body)
+		result := initializers.DB.Create(&body)
+
+		if result.Error != nil {
+			c.JSON(500, map[string]interface{}{
+				"message": result.Error.Error(),
+			})
+			return
+		}
 		c.JSON(200, map[string]interface{}{
-			"message": "create patient",
+			"message": "Data registered successfully",
+			"id":      body.ID,
 		})
 	})
 
