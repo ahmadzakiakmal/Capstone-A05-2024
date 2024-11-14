@@ -26,6 +26,7 @@ func main() {
 	})
 
 	r.POST("/patient-data", controllers.RegisterPatientData)
+	r.GET("/patient-data", controllers.GetAllPatientData)
 
 	r.Run()
 }

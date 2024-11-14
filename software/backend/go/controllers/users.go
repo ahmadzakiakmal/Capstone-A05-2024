@@ -40,3 +40,12 @@ func RegisterPatientData(c *gin.Context) {
 		"id":      body.ID,
 	})
 }
+
+func GetAllPatientData(c *gin.Context) {
+	var patientData []models.PatientData
+	result := initializers.DB.Find(&patientData)
+	c.JSON(200, map[string]interface{}{
+		"length": result.RowsAffected,
+		"data":   patientData,
+	})
+}
