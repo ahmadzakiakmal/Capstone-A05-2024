@@ -17,14 +17,6 @@ type DataPoint = {
   value: number;
 };
 
-// type PatientData = {
-//   name: string;
-//   age: number;
-//   maxRms: number;
-//   maxAmplitude: number;
-//   dateOfExamination: string;
-// };
-
 export default function Dashboard() {
   const [realtimeData, setRealtimeData] = useState<DataPoint[]>([]);
   const [historicalData, setHistoricalData] = useState<DataPoint[]>([]);
