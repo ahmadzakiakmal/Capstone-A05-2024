@@ -20,10 +20,10 @@ type DataPoint = {
 export default function Dashboard() {
   const [realtimeData, setRealtimeData] = useState<DataPoint[]>([]);
   const [historicalData, setHistoricalData] = useState<DataPoint[]>([]);
-  const [averageAmplitude, setAverageAmplitude] = useState<number>(2);
-  const [maxAmplitude, setMaxAmplitude] = useState<number>(3);
+  const [averageAmplitude, setAverageAmplitude] = useState<number>(0);
+  const [maxAmplitude, setMaxAmplitude] = useState<number>(0);
   const [rms, setRms] = useState<number>(0);
-  const [maxRms, setMaxRms] = useState<number>(4);
+  const [maxRms, setMaxRms] = useState<number>(0);
   const [showPopUp, setShowPopUp] = useState<boolean>(false);
   const [mqttClient, setMqttClient] = useState<MqttClient | null>(null);
   const [isRecording, setIsRecording] = useState<boolean>(false);
@@ -211,6 +211,7 @@ export default function Dashboard() {
               className="text-white"
               onClick={() => {
                 reset();
+                mqttClient?.unsubscribe("esp32/data");
               }}
             >
               Cancel
@@ -228,7 +229,7 @@ export default function Dashboard() {
               <LineChart data={realtimeData}>
                 <CartesianGrid />
                 <XAxis dataKey="time" />
-                <YAxis />
+                <YAxis domain={[0,4095]} />
                 <Line
                   dataKey="value"
                   stroke="#16AAC3"
@@ -246,7 +247,7 @@ export default function Dashboard() {
               <LineChart data={historicalData}>
                 <CartesianGrid />
                 <XAxis dataKey="time" />
-                <YAxis />
+                <YAxis domain={[0,4095]} />
                 <Line
                   dataKey="value"
                   stroke="#16AAC3"

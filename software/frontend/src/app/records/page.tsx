@@ -64,9 +64,9 @@ export default function RecordsPage() {
                   {new Date(pd.CreatedAt).toLocaleDateString()}
                 </p>
                 <p className="min-w-[200px]">Age: {pd.Age}</p>
-                <p className="min-w-[200px]">Avg. Amplitude: {pd.AverageAmplitude} V</p>
-                <p className="min-w-[200px]">Max Amplitude: {pd.MaxAmplitude} V</p>
-                <p className="min-w-[200px]">Max RMS: {pd.MaxRms} V</p>
+                <p className="min-w-[200px]">Avg. Amplitude: {pd.AverageAmplitude.toFixed(2)} V</p>
+                <p className="min-w-[200px]">Max Amplitude: {pd.MaxAmplitude.toFixed(2)} V</p>
+                <p className="min-w-[200px]">Max RMS: {pd.MaxRms.toFixed(2)} V</p>
               </Card>
             </div>
           );
